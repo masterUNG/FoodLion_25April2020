@@ -6,6 +6,7 @@ import 'package:foodlion/models/order_user_model.dart';
 import 'package:foodlion/models/user_model.dart';
 import 'package:foodlion/models/user_shop_model.dart';
 import 'package:foodlion/scaffold/home.dart';
+import 'package:foodlion/scaffold/rider_success.dart';
 import 'package:foodlion/utility/my_api.dart';
 import 'package:foodlion/utility/my_style.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -45,8 +46,7 @@ class _DetailOrderState extends State<DetailOrder> {
   void initState() {
     super.initState();
 
-    setState(() { 
-
+    setState(() {
       orderUserModel = widget.orderUserModel;
       nameShop = widget.nameShop;
       distance = widget.distance;
@@ -124,7 +124,6 @@ class _DetailOrderState extends State<DetailOrder> {
   }
 
   Future<void> findDetailShopAnUser() async {
-    
     UserShopModel userShopModel =
         await MyAPI().findDetailShopWhereId(orderUserModel.idShop);
 
@@ -144,7 +143,7 @@ class _DetailOrderState extends State<DetailOrder> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: acceptJob(),
+      floatingActionButton: stateStatus ? acceptJob() : successJob(),
       appBar: AppBar(
         title: Text('รายการอาหาร $nameShop'),
       ),
@@ -162,6 +161,12 @@ class _DetailOrderState extends State<DetailOrder> {
       ),
     );
   }
+
+  Widget successJob() => FloatingActionButton(
+        backgroundColor: Colors.green,
+        onPressed: null,
+        child: Icon(Icons.android),
+      );
 
   FloatingActionButton acceptJob() => FloatingActionButton(
         child: Icon(Icons.directions_bike),
@@ -278,20 +283,32 @@ class _DetailOrderState extends State<DetailOrder> {
     await Dio().get(url2);
 
     String url =
-        'http://movehubs.com/app/editOrderWhereIdRider.php?isAdd=true&id=$idOrder&Success=$idRider';
+        'http://movehubs.com/app/editOrderWhereIdRider.php?isAdd=true&id=$idOrder&Success=RiderOrder';
     Response response = await Dio().get(url);
     print('resAcceptOrder ==>> $response');
-    if (response.toString() == 'true') {
-      MaterialPageRoute route = MaterialPageRoute(
-        builder: (context) => Home(
-          orderUserModel: orderUserModel,
-          nameShop: nameShop,
-          distance: distance,
-          transport: transport,
-        ),
-      );
-      Navigator.pushAndRemoveUntil(context, route, (route) => false);
-    }
+
+    MyAPI().notificationAPI(orderUserModel.idUser, 'Rider รับ Order', 'คนส่งอาหาร กำลังไปรับอาหาร คะ');
+
+    MaterialPageRoute route = MaterialPageRoute(
+      builder: (context) => RiderSuccess(orderUserModel: orderUserModel,),
+    );
+    Navigator.pushAndRemoveUntil(context, route, (route) => false);
+
+    // setState(() {
+    //   stateStatus = false;
+    // });
+
+    // if (response.toString() == 'true') {
+    //   MaterialPageRoute route = MaterialPageRoute(
+    //     builder: (context) => Home(
+    //       orderUserModel: orderUserModel,
+    //       nameShop: nameShop,
+    //       distance: distance,
+    //       transport: transport,
+    //     ),
+    //   );
+    //   Navigator.pushAndRemoveUntil(context, route, (route) => false);
+    // }
   }
 
   Widget showSumFood() => Row(
@@ -317,7 +334,7 @@ class _DetailOrderState extends State<DetailOrder> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    '$sumPrice บาท',
+                    '${orderUserModel.totalPrice} บาท',
                     style: MyStyle().h2StyleWhite,
                   ),
                 ],
@@ -350,7 +367,7 @@ class _DetailOrderState extends State<DetailOrder> {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Text(
-                    '$distance กิโลเมตร',
+                    distance == 0 ? '1 กิโลเมตร' : '$distance กิโลเมตร',
                     style: MyStyle().h2StyleWhite,
                   ),
                   Text(

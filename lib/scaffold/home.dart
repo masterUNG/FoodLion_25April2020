@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:foodlion/models/order_user_model.dart';
 import 'package:foodlion/scaffold/detailOrder.dart';
 import 'package:foodlion/scaffold/rider_loged.dart';
+import 'package:foodlion/scaffold/rider_success.dart';
 import 'package:foodlion/scaffold/show_cart.dart';
 import 'package:foodlion/widget/add_my_food.dart';
 import 'package:foodlion/widget/guest.dart';
@@ -49,7 +52,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   // Field
   Widget cuttentWidget = MyStyle().showProgress();
-  String nameLogin, avatar, modeLogin, loginType, token, nameShop;
+  String nameLogin, avatar, modeLogin, loginType, token, nameShop, id;
   bool statusLogin = false; //false => no login
   int amount = 0, distance, transport;
   OrderUserModel orderUserModel;
@@ -112,6 +115,7 @@ class _HomeState extends State<Home> {
       nameLogin = preferences.getString('Name');
       avatar = preferences.getString('UrlShop');
       loginType = preferences.getString('Login');
+      id = preferences.getString('id');
 
       if (modeLogin == 'Shop') {
         if (!(nameLogin == null || nameLogin.isEmpty)) {
@@ -126,32 +130,28 @@ class _HomeState extends State<Home> {
         );
         Navigator.pushAndRemoveUntil(context, route, (route) => false);
       } else if (modeLogin == 'Dev') {
-        // print('Dev Work nameLogin == $nameLogin ###############');
-        if (!(nameLogin == null || nameLogin.isEmpty)) {
-          // print('Dev Work nameShop = $nameShop ###############');
-          if (nameShop != null) {
+        String url =
+            'http://movehubs.com/app/getOrderWhereIdDevAnSuccess.php?isAdd=true&idDelivery=$id&Success=RiderOrder';
+        Response response = await Dio().get(url);
+        // print('res Dev ===>>>> $response');
+
+        if (response.toString() != 'null') {
+          var result = json.decode(response.data);
+          for (var map in result) {
+            // print('map = $map');
+
+            OrderUserModel orderUserModel = OrderUserModel.fromJson(map);
+
             MaterialPageRoute route = MaterialPageRoute(
-              builder: (context) => DetailOrder(
-                orderUserModel: orderUserModel,
-                nameShop: nameShop,
-                distance: distance,
-                transport: transport,
-              ),
+              builder: (context) => RiderSuccess(orderUserModel: orderUserModel,),
             );
             Navigator.pushAndRemoveUntil(context, route, (route) => false);
-          } else {
-            setState(() {
-              print('Dev Work ###############');
-
-              // MaterialPageRoute route = MaterialPageRoute(
-              //   builder: (context) => RiderLogin(),
-              // );
-              // Navigator.pushAndRemoveUntil(context, route, (route) => false);
-
-              statusLogin = true;
-              cuttentWidget = MyDelivery();
-            });
           }
+        } else {
+          setState(() {
+            statusLogin = true;
+            cuttentWidget = MyDelivery();
+          });
         }
       } else {
         setState(() {

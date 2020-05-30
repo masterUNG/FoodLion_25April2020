@@ -107,7 +107,8 @@ class _MyDeliveryState extends State<MyDelivery> {
     transports.clear();
 
     // String url = 'http://movehubs.com/app/getOrderWhereStatus0.php?isAdd=true';
-    String url = 'http://movehubs.com/app/getOrderWhereSuccess.php?isAdd=true&Success=ShopOrder';
+    String url =
+        'http://movehubs.com/app/getOrderWhereSuccess.php?isAdd=true&Success=ShopOrder';
     Response response = await Dio().get(url);
     var result = json.decode(response.data);
     print('result ==>> ${result.toString()}');
@@ -161,7 +162,8 @@ class _MyDeliveryState extends State<MyDelivery> {
               MyStyle().showTitle(nameShops[index]),
               Row(
                 children: <Widget>[
-                  Container(margin: EdgeInsets.only(left: 16.0),
+                  Container(
+                    margin: EdgeInsets.only(left: 16.0),
                     child: Text(
                       orderUserModels[index].dateTime,
                       style: MyStyle().h2Style,
