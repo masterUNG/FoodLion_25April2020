@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:foodlion/models/food_model.dart';
 import 'package:foodlion/models/order_user_model.dart';
 import 'package:foodlion/models/user_model.dart';
+import 'package:foodlion/scaffold/home.dart';
 import 'package:foodlion/utility/find_token.dart';
 import 'package:foodlion/utility/my_api.dart';
 import 'package:foodlion/utility/my_style.dart';
@@ -87,7 +88,8 @@ class _OrderShopState extends State<OrderShop> {
         'http://movehubs.com/app/getOrderWhereIdShopSuccess0.php?isAdd=true&idShop=$idShop';
     try {
       Response response = await Dio().get(urlOrder);
-      print('res on readOrder ==> $response');
+      print('res on readOrder ##########################==> $response');
+      print('lenagth =================================>>>>>> ${orderUserModels.length}');
       var result = json.decode(response.data);
 
       for (var map in result) {
@@ -323,18 +325,18 @@ class _OrderShopState extends State<OrderShop> {
     print('idOrder = $idOrder, Success = $success');
     String url =
         'http://movehubs.com/app/editStatusShopOrderWhereId.php?isAdd=true&id=$idOrder&Success=$success';
-    // print('url = $url');
 
     await Dio().get(url).then(
       (value) {
-        
         print('value ##########>>> $value');
 
         if (value.statusCode == 200) {
           //Sent Notification All Rider
-          
+
           MyAPI().notiToRider();
-          readOrder();
+          MaterialPageRoute route = MaterialPageRoute(builder: (context) => Home(),);
+          Navigator.pushAndRemoveUntil(context, route, (route) => false);
+          // readOrder();
         } else {
           normalToast('กรุณา ลองใหม่ ระบบขัดข้อง คะ');
         }

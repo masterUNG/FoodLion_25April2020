@@ -31,7 +31,7 @@ class DetailOrder extends StatefulWidget {
 class _DetailOrderState extends State<DetailOrder> {
   // Field
   OrderUserModel orderUserModel;
-  String nameShop, nameUser;
+  String nameShop, nameUser, tokenUser;
   int distance, transport, sumFood = 0;
   LatLng shopLatLng, userLatLng;
   IconData shopMarkerIcon;
@@ -135,6 +135,7 @@ class _DetailOrderState extends State<DetailOrder> {
           double.parse(userShopModel.lng.trim()));
 
       nameUser = userModel.name;
+      tokenUser = userModel.token;
       userLatLng = LatLng(double.parse(userModel.lat.trim()),
           double.parse(userModel.lng.trim()));
     });
@@ -287,7 +288,7 @@ class _DetailOrderState extends State<DetailOrder> {
     Response response = await Dio().get(url);
     print('resAcceptOrder ==>> $response');
 
-    MyAPI().notificationAPI(orderUserModel.idUser, 'Rider รับ Order', 'คนส่งอาหาร กำลังไปรับอาหาร คะ');
+    MyAPI().notificationAPI(tokenUser, 'Rider รับ Order', 'คนส่งอาหาร กำลังไปรับอาหาร คะ');
 
     MaterialPageRoute route = MaterialPageRoute(
       builder: (context) => RiderSuccess(orderUserModel: orderUserModel,),

@@ -1,11 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:foodlion/models/order_user_model.dart';
-import 'package:foodlion/scaffold/detailOrder.dart';
-import 'package:foodlion/scaffold/rider_loged.dart';
 import 'package:foodlion/scaffold/rider_success.dart';
 import 'package:foodlion/scaffold/show_cart.dart';
 import 'package:foodlion/widget/add_my_food.dart';
@@ -76,15 +72,10 @@ class _HomeState extends State<Home> {
     setState(() {
       lat = locationData.latitude;
       lng = locationData.longitude;
-      print('lat ==>> $lat, lng ==>> $lng');
 
       checkWidget();
       checkLogin();
 
-      // cuttentWidget = Guest(
-      //   lat: lat,
-      //   lng: lng,
-      // );
     });
   }
 
