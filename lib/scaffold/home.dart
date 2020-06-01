@@ -68,14 +68,14 @@ class _HomeState extends State<Home> {
   }
 
   Future<Null> findLatLng() async {
+    print('##################findLatLng on Home Work#######################');
     LocationData locationData = await findLocationData();
     setState(() {
       lat = locationData.latitude;
       lng = locationData.longitude;
 
-      checkWidget();
       checkLogin();
-
+      checkWidget();
     });
   }
 
@@ -100,6 +100,7 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> checkLogin() async {
+    print('#############CheckLogin On Home Work#############');
     try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       modeLogin = preferences.getString('Login');
@@ -124,17 +125,19 @@ class _HomeState extends State<Home> {
         String url =
             'http://movehubs.com/app/getOrderWhereIdDevAnSuccess.php?isAdd=true&idDelivery=$id&Success=RiderOrder';
         Response response = await Dio().get(url);
-        // print('res Dev ===>>>> $response');
+        print('res Dev ######################===>>>> $response');
 
         if (response.toString() != 'null') {
           var result = json.decode(response.data);
           for (var map in result) {
-            // print('map = $map');
+            print('map = $map');
 
             OrderUserModel orderUserModel = OrderUserModel.fromJson(map);
 
             MaterialPageRoute route = MaterialPageRoute(
-              builder: (context) => RiderSuccess(orderUserModel: orderUserModel,),
+              builder: (context) => RiderSuccess(
+                orderUserModel: orderUserModel,
+              ),
             );
             Navigator.pushAndRemoveUntil(context, route, (route) => false);
           }

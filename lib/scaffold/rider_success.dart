@@ -153,17 +153,14 @@ class _RiderSuccessState extends State<RiderSuccess> {
     String url =
         'http://movehubs.com/app/editOrderWhereIdRider.php?isAdd=true&id=${orderUserModel.id}&Success=Success';
     await Dio().get(url).then((value) {
-      if (value.toString() == 'true') {
-
-        MyAPI().notificationAPI(tokenUser, 'รับอาหารจากร้าน', 'Rider รับอาหารจากร้านแล้ว ครับ กำลังไปส่ง');
+      print('value from orderSuccess ################===========>>>>> $value and tokenUser ---->>> $tokenUser');
+       MyAPI().notificationAPI(tokenUser, 'รับอาหารจากร้าน',
+            'Rider รับอาหารจากร้านแล้ว ครับ กำลังไปส่ง');
 
         MaterialPageRoute route = MaterialPageRoute(
           builder: (context) => Home(),
         );
         Navigator.pushAndRemoveUntil(context, route, (route) => false);
-      } else {
-        normalDialog(context, 'มีความผิดปกติ', 'กรุณาลองใหม่');
-      }
     });
   }
 
@@ -171,7 +168,9 @@ class _RiderSuccessState extends State<RiderSuccess> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: successJob(),
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('ไปรับอาหารจาก ร้าน และ ส่งให้ลูกค้า'),
+      ),
       body: Column(
         children: <Widget>[
           MyStyle().showTitle(nameShop == null ? '' : nameShop),
