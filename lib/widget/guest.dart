@@ -61,11 +61,6 @@ class _GuestState extends State<Guest> {
       readShopThread();
       checkAmount();
       findUser();
-
-      // cuttentWidget = Guest(
-      //   lat: lat,
-      //   lng: lng,
-      // );
     });
   }
 

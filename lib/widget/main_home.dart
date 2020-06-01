@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
@@ -12,12 +10,15 @@ import 'package:foodlion/models/user_shop_model.dart';
 import 'package:foodlion/scaffold/home.dart';
 import 'package:foodlion/scaffold/show_cart.dart';
 import 'package:foodlion/utility/find_token.dart';
+import 'package:foodlion/utility/my_api.dart';
 import 'package:foodlion/utility/my_constant.dart';
 import 'package:foodlion/utility/my_style.dart';
 import 'package:foodlion/utility/normal_toast.dart';
 import 'package:foodlion/utility/sqlite_helper.dart';
 import 'package:foodlion/widget/my_food.dart';
 import 'package:foodlion/widget/show_order_user.dart';
+import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainHome extends StatefulWidget {
@@ -33,6 +34,7 @@ class _MainHomeState extends State<MainHome> {
   List<Widget> showBanners = List();
   String idUser, nameLogin;
   int amount = 0;
+  double lat, lng;
 
   // Method
   @override
@@ -41,10 +43,31 @@ class _MainHomeState extends State<MainHome> {
 
     aboutNotification();
     editToken();
-    readBanner();
-    readShopThread();
-    checkAmount();
-    findUser();
+    findLatLng();
+  }
+
+  Future<Null> findLatLng() async {
+    LocationData locationData = await findLocationData();
+
+    setState(() {
+
+      lat = locationData.latitude;
+      lng = locationData.longitude;
+
+      readBanner();
+      readShopThread();
+      checkAmount();
+      findUser();
+    });
+  }
+
+  Future<LocationData> findLocationData() async {
+    Location location = Location();
+    try {
+      return location.getLocation();
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<Null> aboutNotification() async {
@@ -56,7 +79,7 @@ class _MainHomeState extends State<MainHome> {
       onMessage: (message) {
         // ขณะเปิดแอพอยู่
         print('onMessage ==> $message');
-         normalToast('มี Notification คะ');
+        normalToast('มี Notification คะ');
       },
       onResume: (message) {
         // ปิดเครื่อง หรือ หน้าจอ
@@ -133,9 +156,19 @@ class _MainHomeState extends State<MainHome> {
 
       for (var map in result) {
         UserShopModel model = UserShopModel.fromJson(map);
+
+ double distance = MyAPI().calculateDistance(
+          lat,
+          lng,
+          double.parse(model.lat.trim()),
+          double.parse(model.lng.trim()),
+        );
+
+        var myFormat = NumberFormat('##0.0#', 'en_US');
+
         setState(() {
           userShopModels.add(model);
-          showWidgets.add(createCard(model));
+          showWidgets.add(createCard(model, '${myFormat.format(distance)}'));
         });
       }
     } catch (e) {}
@@ -162,7 +195,7 @@ class _MainHomeState extends State<MainHome> {
     );
   }
 
-  Widget createCard(UserShopModel model) {
+  Widget createCard(UserShopModel model, String distance) {
     return GestureDetector(
       onTap: () {
         print('You Click ${model.id}');
@@ -178,10 +211,15 @@ class _MainHomeState extends State<MainHome> {
           children: <Widget>[
             showImageShop(model),
             showName(model),
+            showDistance(distance),
           ],
         ),
       ),
     );
+  }
+
+   Widget showDistance(String distance) {
+    return Text('$distance Km.');
   }
 
   Text showName(UserShopModel model) => Text(
@@ -198,7 +236,7 @@ class _MainHomeState extends State<MainHome> {
             child: GridView.extent(
               mainAxisSpacing: 3.0,
               crossAxisSpacing: 3.0,
-              maxCrossAxisExtent: 160.0,
+              maxCrossAxisExtent: 260.0,
               children: showWidgets,
             ),
           );
@@ -376,7 +414,9 @@ class _MainHomeState extends State<MainHome> {
     // return showShop();
 
     return Scaffold(
-      drawer: Drawer(child: userList(),),
+      drawer: Drawer(
+        child: userList(),
+      ),
       appBar: AppBar(
         actions: <Widget>[showCart()],
       ),
