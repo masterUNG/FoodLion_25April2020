@@ -64,11 +64,11 @@ class MyAPI {
 // นีคือ Function ในการคำนวนค่าส่งอาหาร
   int checkTransport(int distance) {
     int transport = 0;
-    if (distance <= 5) {
-      transport = 25;
+    if (distance <= 1) {
+      transport = 19;
       return transport;
     } else {
-      transport = 25 + ((distance - 5) * 5);
+      transport = 19 + ((distance - 1) * 3);
       return transport;
     }
   }
