@@ -108,11 +108,13 @@ class _RiderSuccessState extends State<RiderSuccess> {
     }
   }
 
-  Widget successJob() => FloatingActionButton(
-        backgroundColor: Colors.green,
-        onPressed: () => confirmSuccessDialog(),
-        child: Icon(Icons.android),
-      );
+  Widget successJob() => Container(margin: EdgeInsets.only(bottom: 120.0,),
+    child: FloatingActionButton(
+          backgroundColor: Colors.green,
+          onPressed: () => confirmSuccessDialog(),
+          child: Icon(Icons.android),
+        ),
+  );
 
   Future<Null> confirmSuccessDialog() async {
     showDialog(
