@@ -35,6 +35,8 @@ class _MainHomeState extends State<MainHome> {
   String idUser, nameLogin;
   int amount = 0;
   double lat, lng;
+  bool statusShowCard = false;
+
 
   // Method
   @override
@@ -168,7 +170,11 @@ class _MainHomeState extends State<MainHome> {
 
         setState(() {
           userShopModels.add(model);
-          showWidgets.add(createCard(model, '${myFormat.format(distance)}'));
+          if (distance <= 30.0) {
+            showWidgets.add(createCard(model, '${myFormat.format(distance)}'));
+            statusShowCard = true;
+          }
+          
         });
       }
     } catch (e) {}
@@ -418,13 +424,13 @@ class _MainHomeState extends State<MainHome> {
         child: userList(),
       ),
       appBar: AppBar(
-        actions: <Widget>[showCart()],
+        actions: <Widget>[showCart()],title: Text('ผู้สั่งอาหาร'),
       ),
       body: Column(
         children: <Widget>[
           showBanner(),
           MyStyle().showTitle('ร้านอาหารใกล้คุณ'),
-          showShop(),
+          statusShowCard ? showShop() : Center(child: MyStyle().showTitleH2Dark('ขออภัยคะ ไม่มี ร้านอาหารใกล้คุณเลย คะ'),),
         ],
       ),
     );
