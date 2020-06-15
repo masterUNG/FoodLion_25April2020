@@ -53,9 +53,9 @@ class _OrderShopState extends State<OrderShop> {
         print('onResume ==> $message');
         readOrder();
       },
-      onBackgroundMessage: (message) {
-        print('onBackgroundMessage ==> $message');
-      },
+      // onBackgroundMessage: (message) {
+      //   // print('onBackgroundMessage ==> $message');
+      // },
     );
   }
 
@@ -89,7 +89,8 @@ class _OrderShopState extends State<OrderShop> {
     try {
       Response response = await Dio().get(urlOrder);
       print('res on readOrder ##########################==> $response');
-      print('lenagth =================================>>>>>> ${orderUserModels.length}');
+      print(
+          'lenagth =================================>>>>>> ${orderUserModels.length}');
       var result = json.decode(response.data);
 
       for (var map in result) {
@@ -301,6 +302,7 @@ class _OrderShopState extends State<OrderShop> {
               cancelButton(index),
             ],
           ),
+          waitButton(),
         ],
       ),
     );
@@ -332,9 +334,14 @@ class _OrderShopState extends State<OrderShop> {
 
         if (value.statusCode == 200) {
           //Sent Notification All Rider
-
           MyAPI().notiToRider();
-          MaterialPageRoute route = MaterialPageRoute(builder: (context) => Home(),);
+
+          //Sent Notification to User
+          // sentNotiToUser(index);
+
+          MaterialPageRoute route = MaterialPageRoute(
+            builder: (context) => Home(),
+          );
           Navigator.pushAndRemoveUntil(context, route, (route) => false);
           // readOrder();
         } else {
@@ -356,5 +363,33 @@ class _OrderShopState extends State<OrderShop> {
       ),
       label: Text('ไม่สะดวกรับ order'),
     );
+  }
+
+  Widget waitButton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Container(
+          width: 250.0,
+          child: OutlineButton.icon(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.question_answer,
+              color: Colors.red,
+            ),
+            label: Text('ยังไม่ตััดสินใจ'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<Null> sentNotiToUser(int index) async {
+    UserModel userModel =
+        await MyAPI().findDetailUserWhereId(orderUserModels[index].idUser);
+    MyAPI().notificationAPI(userModel.token, 'Rider กำลังไปรับอาหาร',
+        'Rider กำลังไปรับ อาหารที่ร้านค้า คะ รอแป้ป');
   }
 }

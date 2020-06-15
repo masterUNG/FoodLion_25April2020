@@ -53,9 +53,9 @@ class _MyDeliveryState extends State<MyDelivery> {
         print('onResume ==> $message');
         readOrder();
       },
-      onBackgroundMessage: (message) {
-        print('onBackgroundMessage ==> $message');
-      },
+      // onBackgroundMessage: (message) {
+      //   print('onBackgroundMessage ==> $message');
+      // },
     );
   }
 

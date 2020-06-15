@@ -239,8 +239,30 @@ class _DetailOrderState extends State<DetailOrder> {
               cancel('ไม่รับงานนี คะ'),
             ],
           ),
+          // waitButton(),
         ],
       ),
+    );
+  }
+
+  Widget waitButton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Container(
+          width: 250.0,
+          child: OutlineButton.icon(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.question_answer,
+              color: Colors.red,
+            ),
+            label: Text('ยังไม่ตััดสินใจ'),
+          ),
+        ),
+      ],
     );
   }
 
@@ -288,10 +310,19 @@ class _DetailOrderState extends State<DetailOrder> {
     Response response = await Dio().get(url);
     print('resAcceptOrder ==>> $response');
 
-    MyAPI().notificationAPI(tokenUser, 'Rider รับ Order', 'คนส่งอาหาร กำลังไปรับอาหาร คะ');
+    //Send Notification to User
+    MyAPI().notificationAPI(
+        tokenUser, 'Rider รับ Order', 'คนส่งอาหาร กำลังไปรับอาหาร คะ');
+
+    //Send Notification to Shop
+    UserShopModel userShopModel = await MyAPI().findDetailShopWhereId(orderUserModel.idShop);
+    String tokenShop = userShopModel.token;
+    MyAPI().notificationAPI(tokenShop, 'Rider กำลังไปรับอาหาร', 'Rider กำลังไปที่ ร้านเพื่อรับอาหาร');
 
     MaterialPageRoute route = MaterialPageRoute(
-      builder: (context) => RiderSuccess(orderUserModel: orderUserModel,),
+      builder: (context) => RiderSuccess(
+        orderUserModel: orderUserModel,
+      ),
     );
     Navigator.pushAndRemoveUntil(context, route, (route) => false);
 

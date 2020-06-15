@@ -40,6 +40,8 @@ class MyAPI {
     }
   }
 
+  
+
   Future<Null> aboutNotification() async {
     FirebaseMessaging firebaseMessaging = FirebaseMessaging();
     firebaseMessaging.configure(
