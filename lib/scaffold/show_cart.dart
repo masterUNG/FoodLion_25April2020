@@ -10,6 +10,7 @@ import 'package:foodlion/utility/my_api.dart';
 import 'package:foodlion/utility/my_style.dart';
 import 'package:foodlion/utility/normal_dialog.dart';
 import 'package:foodlion/utility/sqlite_helper.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ShowCart extends StatefulWidget {
@@ -206,8 +207,17 @@ class _ShowCartState extends State<ShowCart> {
         actions: <Widget>[
           FlatButton(
             onPressed: () {
-              orderThread();
-              Navigator.of(context).pop();
+              print('Confirm Here');
+              if (MyAPI().checkTimeShop()) {
+                 Navigator.of(context).pop();
+                orderThread();
+              } else {
+                Navigator.of(context).pop();
+                normalDialog(context, 'ร้านปิดครับ', 'อยู่นอกเวลาทำการครับ ร้านปิด');
+              }
+
+              
+              
             },
             child: Text(
               'Confirm',
@@ -234,7 +244,8 @@ class _ShowCartState extends State<ShowCart> {
     List<String> amountFoods = List();
     String tokenShop;
 
-    UserShopModel userShopModel = await MyAPI().findDetailShopWhereId(idShopOnSQLites[0].toString());
+    UserShopModel userShopModel =
+        await MyAPI().findDetailShopWhereId(idShopOnSQLites[0].toString());
     tokenShop = userShopModel.token;
 
     for (var model in orderModels) {
@@ -242,15 +253,16 @@ class _ShowCartState extends State<ShowCart> {
       amountFoods.add(model.amountFood);
     }
 
-    String url = 'http://movehubs.com/app/addOrder.php?isAdd=true&idUser=${userModel.id}&idShop=${idShopOnSQLites[0]}&DateTime=$dateTime&idFoods=${idFoods.toString()}&amountFoods=${amountFoods.toString()}&totalDelivery=$totalDelivery&totalPrice=$totalPrice&sumTotal=$sumTotal';
+    String url =
+        'http://movehubs.com/app/addOrder.php?isAdd=true&idUser=${userModel.id}&idShop=${idShopOnSQLites[0]}&DateTime=$dateTime&idFoods=${idFoods.toString()}&amountFoods=${amountFoods.toString()}&totalDelivery=$totalDelivery&totalPrice=$totalPrice&sumTotal=$sumTotal';
 
     Response response = await Dio().get(url);
     if (response.toString() == 'true') {
       print('Success Order');
-      
+
       await SQLiteHelper().deleteSQLiteAll().then((value) {
-       
-        MyAPI().notificationAPI(tokenShop, 'มีรายการอาหาร จาก Send', 'มีรายการอาหารสั่งมา คะ') ;
+        MyAPI().notificationAPI(
+            tokenShop, 'มีรายการอาหาร จาก Send', 'มีรายการอาหารสั่งมา คะ');
         // notiToRider();
         Navigator.of(context).pop();
       });
@@ -259,8 +271,6 @@ class _ShowCartState extends State<ShowCart> {
           'กรุณาทิ้งไว้สักครู่ แล้วค่อย Confirm Order ใหม่ คะ');
     }
   }
-
-  
 
   Future<Null> notiToRider() async {
     String urlGetAllOrderStatus0 = 'http://movehubs.com/app/getAllRider.php';
@@ -505,4 +515,6 @@ class _ShowCartState extends State<ShowCart> {
       ],
     );
   }
+
+  
 }

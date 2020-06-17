@@ -40,7 +40,28 @@ class MyAPI {
     }
   }
 
-  
+  bool checkTimeShop() {
+    DateTime now = DateTime.now();
+    print('now = ${now.toString()}');
+    DateTime open = now;
+    DateTime close = now;
+    open = DateTime(now.year, now.month, now.day, 8, 0);
+    close = DateTime(now.year, now.month, now.day, 18, 0);
+    print('open = ${open.toString()}');
+
+    if (now.isAfter(open)) {
+      if (now.isBefore(close)) {
+        print('ร้านเปิดครับ');
+        return true;
+      } else {
+        print('ร้านปิดครับ');
+        return false;
+      }
+    } else {
+      print('ร้านยังไม่เปิด');
+      return false;
+    }
+  }
 
   Future<Null> aboutNotification() async {
     FirebaseMessaging firebaseMessaging = FirebaseMessaging();
