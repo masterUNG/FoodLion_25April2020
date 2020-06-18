@@ -6,6 +6,7 @@ import 'package:foodlion/scaffold/rider_success.dart';
 import 'package:foodlion/scaffold/show_cart.dart';
 import 'package:foodlion/widget/add_my_food.dart';
 import 'package:foodlion/widget/guest.dart';
+import 'package:foodlion/widget/handle_shop.dart';
 import 'package:foodlion/widget/info_shop.dart';
 import 'package:foodlion/widget/main_home.dart';
 import 'package:foodlion/widget/my_delivery.dart';
@@ -125,12 +126,12 @@ class _HomeState extends State<Home> {
         String url =
             'http://movehubs.com/app/getOrderWhereIdDevAnSuccess.php?isAdd=true&idDelivery=$id&Success=RiderOrder';
         Response response = await Dio().get(url);
-        print('res Dev ######################===>>>> $response');
+        // print('res Dev ######################===>>>> $response');
 
         if (response.toString() != 'null') {
           var result = json.decode(response.data);
           for (var map in result) {
-            print('map = $map');
+            // print('map = $map');
 
             OrderUserModel orderUserModel = OrderUserModel.fromJson(map);
 
@@ -200,6 +201,7 @@ class _HomeState extends State<Home> {
       children: <Widget>[
         showHeadShop(),
         menuOrderShop(),
+        handleMenu(),
         menuInfoShop(),
         menuMyFoodShop(),
         menuAddMyFood(),
@@ -306,6 +308,30 @@ class _HomeState extends State<Home> {
       ),
       onTap: () {
         Navigator.of(context).pop();
+      },
+    );
+  }
+
+  Widget handleMenu() {
+    return ListTile(
+      leading: Icon(
+        Icons.control_point,
+        size: 36.0,
+        color: MyStyle().dartColor,
+      ),
+      title: Text(
+        'รายการอาหารยังไม่เสร็จ',
+        style: MyStyle().h2Style,
+      ),
+      subtitle: Text(
+        'คือรายการอาหารที่รับ Order แล้วแต่ยังไม่ได้ส่งให้ Rider',
+        style: MyStyle().h3StylePrimary,
+      ),
+      onTap: () {       
+        Navigator.of(context).pop();
+        setState(() {
+          cuttentWidget = HandleShop();
+        });
       },
     );
   }

@@ -281,7 +281,7 @@ class _OrderShopState extends State<OrderShop> {
                   ),
                 ),
               ],
-            )
+            ), 
           ],
         ),
       ),
