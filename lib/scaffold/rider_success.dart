@@ -11,6 +11,7 @@ import 'package:foodlion/utility/my_api.dart';
 import 'package:foodlion/utility/my_style.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RiderSuccess extends StatefulWidget {
   final OrderUserModel orderUserModel;
@@ -22,7 +23,7 @@ class RiderSuccess extends StatefulWidget {
 
 class _RiderSuccessState extends State<RiderSuccess> {
   OrderUserModel orderUserModel;
-  String nameShop, nameUser, tokenUser;
+  String nameShop, nameUser, tokenUser, idUser, idShop;
   int distance, transport, sumFood = 0;
   LatLng shopLatLng, userLatLng;
   IconData shopMarkerIcon;
@@ -71,10 +72,12 @@ class _RiderSuccessState extends State<RiderSuccess> {
 
     setState(() {
       nameShop = userShopModel.name;
+      idShop = userShopModel.id;
       shopLatLng = LatLng(double.parse(userShopModel.lat.trim()),
           double.parse(userShopModel.lng.trim()));
 
       nameUser = userModel.name;
+      idUser = userModel.id;
       tokenUser = userModel.token;
       userLatLng = LatLng(double.parse(userModel.lat.trim()),
           double.parse(userModel.lng.trim()));
@@ -209,7 +212,7 @@ class _RiderSuccessState extends State<RiderSuccess> {
       MyAPI().notificationAPI(tokenUser, 'รับอาหาร เรียบร้อย นะคะ',
           'Rider มาส่งอาหารเรียบร้อยนะคะ ขอบคุณที่ใช้บริการของ Send คะ');
 
-          // exit(0);
+      // exit(0);
 
       MaterialPageRoute route = MaterialPageRoute(
         builder: (context) => Home(),
@@ -245,6 +248,10 @@ class _RiderSuccessState extends State<RiderSuccess> {
 
   Marker shopMarker() {
     return Marker(
+      onTap: () {
+        print('You Tap Shop');
+        confirmCall(nameShop, 'Shop', idShop);
+      },
       markerId: MarkerId('shopID'),
       icon: BitmapDescriptor.defaultMarkerWithHue(100.0),
       position: shopLatLng,
@@ -257,12 +264,51 @@ class _RiderSuccessState extends State<RiderSuccess> {
 
   Marker userMarker() {
     return Marker(
+      onTap: () {
+        confirmCall(nameUser, 'User', idUser);
+      },
       markerId: MarkerId('userID'),
       icon: BitmapDescriptor.defaultMarkerWithHue(310.0),
       position: userLatLng,
       infoWindow: InfoWindow(
         title: 'สถานที่ส่งอาหาร',
         snippet: nameUser,
+      ),
+    );
+  }
+
+  Future<Null> confirmCall(String nameCall, String type, String idCall) async {
+    showDialog(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text('คุณต้องการโทรหาร $nameCall'),
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              OutlineButton.icon(
+                  onPressed: () async{
+                    Navigator.pop(context);
+                    await MyAPI().findPhone(idUser, 'User').then((value) {
+                      callPhoneThread(value);
+                    });
+                    
+                  },
+                  icon: Icon(
+                    Icons.phone,
+                    color: Colors.green,
+                  ),
+                  label: Text('โทร')),
+              OutlineButton.icon(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(
+                    Icons.clear,
+                    color: Colors.red,
+                  ),
+                  label: Text('ไม่โทร')),
+            ],
+          )
+        ],
       ),
     );
   }
@@ -331,5 +377,14 @@ class _RiderSuccessState extends State<RiderSuccess> {
         await MyAPI().findDetailUserWhereId(orderUserModel.idUser);
     MyAPI().notificationAPI(userModel.token, 'Rider รับอาหารแล้ว',
         'Rider รับอาหารจาก ร้านค้าแล้ว คะ ? รออีกนิดนะ คะ');
+  }
+
+  Future<Null> callPhoneThread(String phoneNumber) async {
+    String url = 'tel:$phoneNumber';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Cannot Launch $url';
+    }
   }
 }

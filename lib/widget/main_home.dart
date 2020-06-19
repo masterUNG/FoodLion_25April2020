@@ -12,7 +12,9 @@ import 'package:foodlion/scaffold/show_cart.dart';
 import 'package:foodlion/utility/find_token.dart';
 import 'package:foodlion/utility/my_api.dart';
 import 'package:foodlion/utility/my_constant.dart';
+import 'package:foodlion/utility/my_search.dart';
 import 'package:foodlion/utility/my_style.dart';
+import 'package:foodlion/utility/normal_dialog.dart';
 import 'package:foodlion/utility/normal_toast.dart';
 import 'package:foodlion/utility/sqlite_helper.dart';
 import 'package:foodlion/widget/my_food.dart';
@@ -204,11 +206,16 @@ class _MainHomeState extends State<MainHome> {
   Widget createCard(UserShopModel model, String distance) {
     return GestureDetector(
       onTap: () {
-        print('You Click ${model.id}');
-        MaterialPageRoute route = MaterialPageRoute(
+       
+        if (MyAPI().checkTimeShop()) {
+          MaterialPageRoute route = MaterialPageRoute(
           builder: (value) => MyFood(idShop: model.id),
         );
         Navigator.of(context).push(route).then((value) => checkAmount());
+        } else {
+          normalDialog(context, 'ร้านปิดแล้ว', 'ต้องขอ อภัยมากๆ ครับ ร้านเปิดบริการ 8.00- 18.00');
+        }
+
       },
       child: Card(
         child: Column(
@@ -264,18 +271,27 @@ class _MainHomeState extends State<MainHome> {
   Widget showCart() {
     return GestureDetector(
       onTap: () {
-        routeToShowCart();
+        if (lat == null) {
+          findLatLng();
+          normalToast('โปรดรอสักครู่ กำลังหาพิกัด');
+        } else {
+          routeToShowCart();
+        }
       },
       child: MyStyle().showMyCart(amount),
     );
   }
 
   void routeToShowCart() {
-    MaterialPageRoute materialPageRoute =
-        MaterialPageRoute(builder: (value) => ShowCart());
+    if (lat == null) {
+      normalToast('กรุณาลองใหม่ กำลังหาพิกัดคะ');
+    } else {
+      MaterialPageRoute materialPageRoute =
+        MaterialPageRoute(builder: (value) => ShowCart(lat: lat,lng: lng,));
     Navigator.of(context)
         .push(materialPageRoute)
         .then((value) => checkAmount());
+    }
   }
 
   ListView userList() {
@@ -415,6 +431,13 @@ class _MainHomeState extends State<MainHome> {
     );
   }
 
+  void routeToShowSearch() {
+    MaterialPageRoute materialPageRoute =
+        MaterialPageRoute(builder: (value) => MySearch());
+    Navigator.of(context)
+        .push(materialPageRoute);
+  }
+
   @override
   Widget build(BuildContext context) {
     // return showShop();
@@ -424,7 +447,10 @@ class _MainHomeState extends State<MainHome> {
         child: userList(),
       ),
       appBar: AppBar(
-        actions: <Widget>[showCart()],title: Text('ผู้สั่งอาหาร'),
+        title: Text('เลือกร้านค้าจ๊า'),
+        actions: <Widget>[IconButton(icon: Icon(Icons.search), onPressed: (){
+          routeToShowSearch();
+        }), showCart()],
       ),
       body: Column(
         children: <Widget>[

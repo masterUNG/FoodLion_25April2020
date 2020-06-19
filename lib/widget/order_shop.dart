@@ -165,12 +165,69 @@ class _OrderShopState extends State<OrderShop> {
     return orderUserModels.length == 0 ? waitOrder() : showListOrder();
   }
 
+  String phone;
+
+  Future<Null> phoneForm() async {
+    showDialog(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: Text('กรุณากรอบ เบอร์ติดต่อ เพื่อสะดวกต่อ คนส่งของ'),
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                width: 150,
+                child: TextField(onChanged: (value) => phone = value.trim(),
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    labelText: 'เบอร์ติดต่อ :',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                width: 200.0,
+                child: RaisedButton.icon(
+                  onPressed: () {
+                    if (phone == null || phone.isEmpty) {
+                      normalToast('เบอร์ติดต่อห้ามว่างเปล่า');
+                    }else if (phone.length == 10) {
+                     MyAPI().addPhoneThread(idShop, 'Shop', phone);
+                     Navigator.pop(context);
+                    } else {
+                      normalToast('กรุณากรอกเบอร์ ให้ครบ ห้ามมีช่องว่าง ');
+                    }
+                  },
+                  icon: Icon(Icons.save),
+                  label: Text('บันทึก'),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
   ListView showListOrder() {
     return ListView.builder(
       padding: EdgeInsets.all(10.0),
       itemCount: orderUserModels.length,
       itemBuilder: (context, index1) => GestureDetector(
-        onTap: () => showConfirmFinish(index1),
+        onTap: () async{
+          String phone = await MyAPI().findPhone(idShop, 'Shop');
+          print('phone = $phone');
+          if (phone == 'null') {
+            phoneForm();
+          } else {
+            showConfirmFinish(index1);
+          }
+        },
         child: Column(
           children: <Widget>[
             MyStyle().showTitle('รายการอาหาร คุณ ${nameUsers[index1]}'),
