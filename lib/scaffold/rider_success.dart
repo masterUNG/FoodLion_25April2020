@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:foodlion/models/food_model.dart';
@@ -287,12 +285,11 @@ class _RiderSuccessState extends State<RiderSuccess> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               OutlineButton.icon(
-                  onPressed: () async{
+                  onPressed: () async {
                     Navigator.pop(context);
                     await MyAPI().findPhone(idUser, 'User').then((value) {
                       callPhoneThread(value);
                     });
-                    
                   },
                   icon: Icon(
                     Icons.phone,

@@ -69,7 +69,7 @@ class _HomeState extends State<Home> {
   }
 
   Future<Null> findLatLng() async {
-    print('##################findLatLng on Home Work#######################');
+    // print('##################findLatLng on Home Work#######################');
     LocationData locationData = await findLocationData();
     setState(() {
       lat = locationData.latitude;
@@ -101,7 +101,7 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> checkLogin() async {
-    print('#############CheckLogin On Home Work#############');
+    // print('#############CheckLogin On Home Work#############');
     try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       modeLogin = preferences.getString('Login');

@@ -88,9 +88,9 @@ class _OrderShopState extends State<OrderShop> {
         'http://movehubs.com/app/getOrderWhereIdShopSuccess0.php?isAdd=true&idShop=$idShop';
     try {
       Response response = await Dio().get(urlOrder);
-      print('res on readOrder ##########################==> $response');
-      print(
-          'lenagth =================================>>>>>> ${orderUserModels.length}');
+      // print('res on readOrder ##########################==> $response');
+      // print(
+      //     'lenagth =================================>>>>>> ${orderUserModels.length}');
       var result = json.decode(response.data);
 
       for (var map in result) {
