@@ -18,8 +18,9 @@ class _HandleShopState extends State<HandleShop> {
   List<OrderUserModel> orderUserModels = List();
   List<UserModel> userModels = List();
   List<List<FoodModel>> listFoodModels = List();
-  
-  
+  List<List<String>> listAmounts = List();
+  List<List<String>> listSums = List();
+  List<List<String>> listStatuss = List();
 
   @override
   void initState() {
@@ -38,6 +39,11 @@ class _HandleShopState extends State<HandleShop> {
       for (var map in result) {
         // print('map ==>> ${map.toString()}');
         OrderUserModel orderUserModel = OrderUserModel.fromJson(map);
+
+        String amount = orderUserModel.amountFoods;
+        amount = amount.substring(1, amount.length - 1);
+        List<String> amounts = amount.split(',');
+        listAmounts.add(amounts);
 
         String foodId = orderUserModel.idFoods;
         foodId = foodId.substring(1, foodId.length - 1);
@@ -83,35 +89,54 @@ class _HandleShopState extends State<HandleShop> {
                   children: <Widget>[
                     Expanded(
                       flex: 3,
-                      child: Text('รายการอาหาร'),
+                      child: MyStyle().showTitleH2DartBold('รายการอาหาร'),
                     ),
                     Expanded(
                       flex: 1,
-                      child: Text('ราคา'),
+                      child: MyStyle().showTitleH2Dark('ราคา'),
                     ),
                     Expanded(
                       flex: 1,
-                      child: Text('จำนวน'),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Text('ผมรวม'),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Text('สถานะ'),
+                      child: MyStyle().showTitleH2Dark('จำนวน'),
                     ),
                   ],
                 ),
-                ListView.builder(shrinkWrap: true,
+                ListView.builder(
+                  shrinkWrap: true,
                   physics: ScrollPhysics(),
                   itemCount: listFoodModels[index].length,
                   itemBuilder: (context, index2) => Row(
                     children: <Widget>[
-                      Text(listFoodModels[index][index2].nameFood),
-                      Text(listFoodModels[index][index2].priceFood),
+                      Expanded(
+                        flex: 4,
+                        child: Text(listFoodModels[index][index2].nameFood),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Text(listFoodModels[index][index2].priceFood),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Text(listAmounts[index][index2].trim()),
+                      ),
                     ],
                   ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    MyStyle().showTitleH2Primary(
+                        'ราคารวม = ${orderUserModels[index].totalPrice} บาท'),
+                    MyStyle().mySizeBox(),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    MyStyle().showTitleH2DartBold(
+                        'สถานะ => ${orderUserModels[index].success}'),
+                    MyStyle().mySizeBox(),
+                  ],
                 )
               ],
             ),
