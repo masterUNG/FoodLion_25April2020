@@ -39,7 +39,6 @@ class _MainHomeState extends State<MainHome> {
   double lat, lng;
   bool statusShowCard = false;
 
-
   // Method
   @override
   void initState() {
@@ -54,7 +53,6 @@ class _MainHomeState extends State<MainHome> {
     LocationData locationData = await findLocationData();
 
     setState(() {
-
       lat = locationData.latitude;
       lng = locationData.longitude;
 
@@ -62,7 +60,14 @@ class _MainHomeState extends State<MainHome> {
       readShopThread();
       checkAmount();
       findUser();
+      updateLatLng();
     });
+  }
+
+  Future<Null> updateLatLng() async {
+    String url =
+        'http://movehubs.com/app/editLatLngUserWhereId.php?isAdd=true&id=$idUser&Lat=$lat&Lng=$lng';
+    Response response = await Dio().get(url);
   }
 
   Future<LocationData> findLocationData() async {
@@ -161,7 +166,7 @@ class _MainHomeState extends State<MainHome> {
       for (var map in result) {
         UserShopModel model = UserShopModel.fromJson(map);
 
- double distance = MyAPI().calculateDistance(
+        double distance = MyAPI().calculateDistance(
           lat,
           lng,
           double.parse(model.lat.trim()),
@@ -176,7 +181,6 @@ class _MainHomeState extends State<MainHome> {
             showWidgets.add(createCard(model, '${myFormat.format(distance)}'));
             statusShowCard = true;
           }
-          
         });
       }
     } catch (e) {}
@@ -206,16 +210,15 @@ class _MainHomeState extends State<MainHome> {
   Widget createCard(UserShopModel model, String distance) {
     return GestureDetector(
       onTap: () {
-       
         if (MyAPI().checkTimeShop()) {
           MaterialPageRoute route = MaterialPageRoute(
-          builder: (value) => MyFood(idShop: model.id),
-        );
-        Navigator.of(context).push(route).then((value) => checkAmount());
+            builder: (value) => MyFood(idShop: model.id),
+          );
+          Navigator.of(context).push(route).then((value) => checkAmount());
         } else {
-          normalDialog(context, 'ร้านปิดแล้ว', 'ต้องขอ อภัยมากๆ ครับ ร้านเปิดบริการ 8.00- 18.00');
+          normalDialog(context, 'ร้านปิดแล้ว',
+              'ต้องขอ อภัยมากๆ ครับ ร้านเปิดบริการ 8.00- 18.00');
         }
-
       },
       child: Card(
         child: Column(
@@ -231,7 +234,7 @@ class _MainHomeState extends State<MainHome> {
     );
   }
 
-   Widget showDistance(String distance) {
+  Widget showDistance(String distance) {
     return Text('$distance Km.');
   }
 
@@ -273,7 +276,7 @@ class _MainHomeState extends State<MainHome> {
       onTap: () {
         if (lat == null) {
           findLatLng();
-          normalToast('โปรดรอสักครู่ กำลังหาพิกัด');
+          normalToast('โปรดรอสักครู่ กำลังห���พิกัด');
         } else {
           routeToShowCart();
         }
@@ -286,11 +289,14 @@ class _MainHomeState extends State<MainHome> {
     if (lat == null) {
       normalToast('กรุณาลองใหม่ กำลังหาพิกัดคะ');
     } else {
-      MaterialPageRoute materialPageRoute =
-        MaterialPageRoute(builder: (value) => ShowCart(lat: lat,lng: lng,));
-    Navigator.of(context)
-        .push(materialPageRoute)
-        .then((value) => checkAmount());
+      MaterialPageRoute materialPageRoute = MaterialPageRoute(
+          builder: (value) => ShowCart(
+                lat: lat,
+                lng: lng,
+              ));
+      Navigator.of(context)
+          .push(materialPageRoute)
+          .then((value) => checkAmount());
     }
   }
 
@@ -434,8 +440,7 @@ class _MainHomeState extends State<MainHome> {
   void routeToShowSearch() {
     MaterialPageRoute materialPageRoute =
         MaterialPageRoute(builder: (value) => MySearch());
-    Navigator.of(context)
-        .push(materialPageRoute);
+    Navigator.of(context).push(materialPageRoute);
   }
 
   @override
@@ -448,15 +453,25 @@ class _MainHomeState extends State<MainHome> {
       ),
       appBar: AppBar(
         title: Text('เลือกร้านค้าจ๊า'),
-        actions: <Widget>[IconButton(icon: Icon(Icons.search), onPressed: (){
-          routeToShowSearch();
-        }), showCart()],
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                routeToShowSearch();
+              }),
+          showCart()
+        ],
       ),
       body: Column(
         children: <Widget>[
           showBanner(),
           MyStyle().showTitle('ร้านอาหารใกล้คุณ'),
-          statusShowCard ? showShop() : Center(child: MyStyle().showTitleH2Dark('ขออภัยคะ ไม่มี ร้านอาหารใกล้คุณเลย คะ'),),
+          statusShowCard
+              ? showShop()
+              : Center(
+                  child: MyStyle()
+                      .showTitleH2Dark('ขออภัยคะ ไม่มี ร้านอาหารใกล้คุณเลย คะ'),
+                ),
         ],
       ),
     );
